@@ -48,10 +48,16 @@ def generate_launch_description():
             output='screen',
             arguments=['--display-config', rviz_config_path]
         )
-
+    static_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='livox_static_tf',
+        arguments=['0', '0', '0', '0', '0', '0', 'map', 'livox_frame']
+    )
     return LaunchDescription([
         livox_driver,
-        livox_rviz,
+        #livox_rviz,
+        static_tf
         # launch.actions.RegisterEventHandler(
         #     event_handler=launch.event_handlers.OnProcessExit(
         #         target_action=livox_rviz,
