@@ -312,8 +312,14 @@ void Lddc::InitPointcloud2Msg(const StoragePacket& pkg, PointCloud2& cloud, uint
 
   #ifdef BUILDING_ROS1
       cloud.header.stamp = ros::Time( timestamp / 1000000000.0);
-  #elif defined BUILDING_ROS2
-      cloud.header.stamp = rclcpp::Time(timestamp);
+  #elif BUILDING_ROS2
+      bool use_sim_time = false;
+      cur_node_->get_parameter("use_sim_time", use_sim_time);
+      if (use_sim_time) {
+          cloud.header.stamp = cur_node_->get_clock()->now();
+      } else {
+          cloud.header.stamp = rclcpp::Time(timestamp);
+      }
   #endif
 
   std::vector<LivoxPointXyzrtlt> points;
@@ -369,7 +375,13 @@ void Lddc::InitCustomMsg(CustomMsg& livox_msg, const StoragePacket& pkg, uint8_t
 #ifdef BUILDING_ROS1
   livox_msg.header.stamp = ros::Time(timestamp / 1000000000.0);
 #elif defined BUILDING_ROS2
-  livox_msg.header.stamp = rclcpp::Time(timestamp);
+  bool use_sim_time = false;
+  cur_node_->get_parameter("use_sim_time", use_sim_time);
+  if (use_sim_time) {
+      livox_msg.header.stamp = cur_node_->get_clock()->now();
+  } else {
+      livox_msg.header.stamp = rclcpp::Time(timestamp);
+  }
 #endif
 
   livox_msg.point_num = pkg.points_num;
